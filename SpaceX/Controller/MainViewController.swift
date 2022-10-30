@@ -102,8 +102,6 @@ class MainViewController: UIViewController {
         scrollView.contentSize = CGSize(width: view.bounds.width * 4 , height: 1138)
         scrollView.isPagingEnabled = true
         guard let infoAboutRocketArray = self.infoAboutRocketArray else { return }
-        
-       // guard let arrayOfImages = arrayOfImages else { return }
         for x in 0...3 {
             self.indexForColletionView = x
             let imageView: UIImageView = {
@@ -149,8 +147,9 @@ class MainViewController: UIViewController {
                     self?.present(navVC, animated: true)
                 }))
                 let image = UIImage(named: "settings")
-                settingsButton.setTitleColor(UIColor(red: 202, green: 202, blue: 202), for: .normal)
-                settingsButton.setImage(image, for: .normal)
+                let tintedImage = image?.withRenderingMode(.alwaysTemplate)
+                settingsButton.setImage(tintedImage, for: .normal)
+                settingsButton.tintColor = UIColor(red: 255, green: 255, blue: 255)
                 return settingsButton
             }()
             imageView.frame = CGRect(x: view.frame.width * CGFloat(x),

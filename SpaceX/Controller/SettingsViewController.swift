@@ -100,7 +100,6 @@ class SettingsViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Настройки"
-        navigationController?.navigationBar.titleTextAttributes = [NSAttributedString.Key.font : UIColor.white]
         view.backgroundColor = UIColor(red: 0, green: 0, blue: 0)
         view.addSubview(heightLabel)
         view.addSubview(diameterLabel)
