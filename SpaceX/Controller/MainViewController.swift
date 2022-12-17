@@ -8,7 +8,7 @@
 import UIKit
 
 class MainViewController: UIViewController {
-
+    private let network = NetworkServices()
     private var collectionView: UICollectionView?
     private let arrayColletionView: [Int] = [1,2,3,4]
     private var arrayOfImages: [UIImage]?
@@ -24,8 +24,6 @@ class MainViewController: UIViewController {
         scrollView.isDirectionalLockEnabled = true
         return scrollView
     }()
-    
-    
     private var pageControll: UIPageControl = {
         let pageControll = UIPageControl()
         pageControll.numberOfPages = 4
@@ -34,32 +32,31 @@ class MainViewController: UIViewController {
         pageControll.pageIndicatorTintColor = UIColor(red: 142, green: 142, blue: 143)
         return pageControll
     }()
-
-    
-    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.addSubview(scrollView)
         view.addSubview(pageControll)
-        
         scrollView.delegate = self
         
-        NetworkServices.shared.jsonRequest(completion: {[weak self] jsonResult in
+        network.jsonRequest(completion: {[weak self] jsonResult in
             switch jsonResult {
             case .success(let json):
                 DispatchQueue.main.async {
-                    self?.infoAboutRocketArray = json
-                    self?.configureScrollView()
+                    self?.network.downloadImages(with: json) { images in
+                        DispatchQueue.main.async {
+                            self?.infoAboutRocketArray = json
+                            self?.arrayOfImages = images
+                            self?.configureScrollView()
+                        }
+                  }
                 }
             case .failure(let error):
                 print(error)
             }
         })
     }
-    
     //MARK: - Setting collectionView
     private func settingCollectionView(view: UIView){
-        
         let frame = CGRect(x: 32,
                            y: 112,
                            width: view.frame.width - 32,
@@ -69,7 +66,6 @@ class MainViewController: UIViewController {
         layout.minimumLineSpacing = 12
         layout.itemSize = CGSize(width: 96, height: 96)
         collectionView = UICollectionView(frame: frame, collectionViewLayout: layout)
-        
         guard let collectionView = collectionView else { return }
         collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: CollectionViewCell.identifier)
         collectionView.showsHorizontalScrollIndicator = false
@@ -78,26 +74,22 @@ class MainViewController: UIViewController {
         collectionView.backgroundColor = UIColor.clear
         //collectionView.allowsSelection = false
         view.addSubview(collectionView)
-        
     }
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
-    
     override func viewDidLayoutSubviews(){
         super.viewDidLayoutSubviews()
         pageControll.frame = CGRect(x: (view.frame.width - 140)/2,
                                     y: view.frame.height - (view.frame.height / 12),
                                     width: 140,
                                     height: 30)
-
         scrollView.frame = CGRect(x: 0,
                                   y: 0,
                                   width: view.bounds.width,
                                   height: view.bounds.height)
     }
-    
     private func configureScrollView() {
         scrollView.contentSize = CGSize(width: view.bounds.width * 4 , height: 1138)
         scrollView.isPagingEnabled = true
@@ -105,19 +97,19 @@ class MainViewController: UIViewController {
         for x in 0...3 {
             self.indexForColletionView = x
             let imageView: UIImageView = {
-                let imageView = UIImageView(image: UIImage(named: "Falcon1"))
+                guard let arrayOfImages = arrayOfImages else {
+                    return UIImageView(image: UIImage(named: "Falcon1"))
+                }
+                let imageView = UIImageView(image: arrayOfImages[x])
                 return imageView
             }()
-            
             let launches: UIButton = {
                 let launches = UIButton(primaryAction: UIAction(handler: {[weak self] _ in
-                   DispatchQueue.main.async {
-                        guard let currentPage = self?.currentPage else { return }
-                        let vc = LaunchesViewController()
-                        vc.title = infoAboutRocketArray[currentPage].name
-                        vc.currentRocket = infoAboutRocketArray[currentPage].id
-                        self?.navigationController?.pushViewController(vc, animated: true)
-                   }
+                    guard let currentPage = self?.currentPage else { return }
+                    let vc = LaunchesViewController()
+                    vc.title = infoAboutRocketArray[currentPage].name
+                    vc.currentRocket = infoAboutRocketArray[currentPage].id
+                    self?.navigationController?.pushViewController(vc, animated: true)
                 }))
                 launches.layer.cornerRadius = 10
                 launches.backgroundColor = UIColor(red: 33, green: 33, blue: 33)
@@ -126,7 +118,6 @@ class MainViewController: UIViewController {
                 launches.setTitleColor(UIColor(red: 255, green: 255, blue: 255), for: .normal)
                 return launches
             }()
-        
             let blackView: UIView = {
                 let blackView = UIView()
                 blackView.layer.cornerRadius = 30
@@ -185,7 +176,6 @@ class MainViewController: UIViewController {
             settingRightLabels(view: blackView, index: x)
         }
     }
-    
     private func settingLeftLabels(view: UIView) {
         
         let firstLaunch: UILabel = {
@@ -199,7 +189,6 @@ class MainViewController: UIViewController {
                                        height: 24)
             return firstLaunch
         }()
-        
         let country: UILabel = {
             let country = UILabel()
             country.font = UIFont(name: "LabGrotesque-Regular", size: 16)
@@ -553,10 +542,6 @@ extension MainViewController: UICollectionViewDelegate, UICollectionViewDataSour
             cell.settingUIElements(data: infoAboutRocketArray[indexPath.row], index: indexPath.row)
         }
         return cell
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-    
     }
 }
 

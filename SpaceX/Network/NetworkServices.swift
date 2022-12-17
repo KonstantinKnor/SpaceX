@@ -44,7 +44,7 @@ class NetworkServices {
         case failedToInfoAboutRocket
     }
     
-    static let shared = NetworkServices()
+    //static let shared = NetworkServices()
     
     public func jsonRequest(completion: @escaping (Result< [InfoAboutRocket],Error>) -> Void){
         
@@ -58,7 +58,6 @@ class NetworkServices {
             }
             do{
                 let result = try JSONDecoder().decode([InfoAboutRocket].self, from: data)
-                
                 completion(.success(result))
                 
             } catch {
@@ -73,27 +72,36 @@ class NetworkServices {
         
         var arrayOfImages: [UIImage] = []
         for i in 0...3 {
-            let countLinks = array[i].flickr_images.count - 1
-            let random = Int.random(in: 0...countLinks)
-            let urlString = array[i].flickr_images[random]
-            guard let url = URL(string: urlString) else {
-                print("Ошибка url")
-                return }
-            URLSession.shared.dataTask(with: url) { data, responce, error in
-                guard let data = data, error == nil else {
-                    print("Ошибка в запросе")
-                    return arrayOfImages.append(UIImage(named: "Falcon1") ?? UIImage())
-                }
-                
-                    guard let image = UIImage(data: data) else {
-                        print("Ошибка присвоении имэдж")
-                        return }
-                    arrayOfImages.append(image)
-                
-            
-            }.resume()
+            switch i {
+            case 0:
+                arrayOfImages.append(UIImage(named: "Falcon1") ?? UIImage())
+            case 1...3:
+                let countLinks = array[i].flickr_images.count - 1
+                let random = Int.random(in: 0...countLinks)
+                let urlString = array[i].flickr_images[random]
+                guard let url = URL(string: urlString) else {
+                    print("Ошибка url")
+                    return }
+                    URLSession.shared.dataTask(with: url) { data, responce, error in
+                        guard let data = data, error == nil else {
+                            print("Ошибка в запросе")
+                            return arrayOfImages.append(UIImage(named: "Falcon1") ?? UIImage())
+                        }
+                        DispatchQueue.main.async {
+                            print(i)
+                                guard let image = UIImage(data: data) else {
+                                    print("Ошибка присвоении имэдж")
+                                    return }
+                                arrayOfImages.append(image)
+                            if i == 3 {
+                                copmpletion(arrayOfImages)
+                            }
+                        }
+                    }.resume()
+            default:
+                arrayOfImages = []
+            }
         }
-    
-       copmpletion(arrayOfImages)
+       
     }
 }

@@ -110,6 +110,7 @@ class SettingsViewController: UIViewController {
         view.addSubview(secondSegment)
         view.addSubview(thirdSegment)
         view.addSubview(fourthSegment)
+        createBarButtonItem()
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -145,7 +146,16 @@ class SettingsViewController: UIViewController {
                                      y: thirdSegment.frame.origin.y + 64,
                                      width: 115,
                                      height: 40)
-        
-        
+    }
+    private func createBarButtonItem(){
+        let dismissButton = UIBarButtonItem(title: "Закрыть",
+                                            style: .done,
+                                            target: self,
+                                            action: #selector(dismissVC))
+        dismissButton.tintColor = .white
+        navigationItem.rightBarButtonItem = dismissButton
+    }
+    @objc private func dismissVC(){
+        dismiss(animated: true)
     }
 }
