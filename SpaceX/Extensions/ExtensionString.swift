@@ -8,7 +8,7 @@
 import Foundation
 
 extension String {
-    func shortСountry()-> String{
+    func shortСountry()-> String {
         switch self{
         case "Republic of the Marshall Islands":
            return "Маршалловы Острова"
@@ -20,8 +20,6 @@ extension String {
     }
     
     func converterDate() -> String{
-        // 20060324
-        //
         let date = self.replacingOccurrences(of: "-", with: "")
         guard let dateInt = Int(date) else { return self }
         let day = dateInt % 100
@@ -58,7 +56,6 @@ extension String {
     }
     
     func deletingСharacters() -> String {
-        //2006-03-24T22:30:00.000Z
         let char = self.dropLast(14)
         return String(char)
     }
