@@ -69,7 +69,6 @@ class NetworkServices {
     
     
     public func downloadImages(with array: [InfoAboutRocket], copmpletion: @escaping ([UIImage]) -> Void){
-        
         var arrayOfImages: [UIImage] = []
         for i in 0...3 {
             switch i {
@@ -88,12 +87,11 @@ class NetworkServices {
                             return arrayOfImages.append(UIImage(named: "Falcon1") ?? UIImage())
                         }
                         DispatchQueue.main.async {
-                            print(i)
                                 guard let image = UIImage(data: data) else {
-                                    print("Ошибка присвоении имэдж")
+                                    print("Ошибка присвоении UIImage")
                                     return }
                                 arrayOfImages.append(image)
-                            if i == 3 {
+                            if arrayOfImages.count == 4 {
                                 copmpletion(arrayOfImages)
                             }
                         }

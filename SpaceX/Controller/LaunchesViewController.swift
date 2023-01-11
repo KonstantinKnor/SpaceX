@@ -8,7 +8,6 @@
 import UIKit
 
 class LaunchesViewController: UIViewController {
-    
     private let tabelView: UITableView = {
         let tabel = UITableView()
         tabel.backgroundColor = UIColor.clear
@@ -18,6 +17,7 @@ class LaunchesViewController: UIViewController {
     public var currentRocket: String?
     override func viewDidLoad() {
         super.viewDidLoad()
+        getData()
         view.backgroundColor = UIColor(red: 0, green: 0, blue: 0)
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Назад",
@@ -25,14 +25,9 @@ class LaunchesViewController: UIViewController {
                                                            target: self,
                                                            action: #selector(back))
         tabelView.register(LaunchesTabelViewCell.self, forCellReuseIdentifier: LaunchesTabelViewCell.identifier)
-        DispatchQueue.main.async {
-            sleep(1)
-            self.tabelView.delegate = self
-            self.tabelView.dataSource = self
-        }
-        
+        tabelView.delegate = self
+        tabelView.dataSource = self
         view.addSubview(tabelView)
-        getData()
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -40,7 +35,6 @@ class LaunchesViewController: UIViewController {
                                  y: 50,
                                  width: view.frame.size.width - 64,
                                  height: view.frame.size.height)
-        
     }
     private func getData(){
         NetworkForLaunches.shered.getLaunches { [weak self] result in
@@ -54,24 +48,21 @@ class LaunchesViewController: UIViewController {
             }
         }
     }
-    
     @objc private func back(){
         navigationController?.popViewController(animated: true)
     }
-    
     private func getArrayLaunches(data: [Launches]){
         data.map { [weak self] result in
             if result.rocket == currentRocket && !result.upcoming {
                 self?.arrayLaunches.append(result)
             }
         }
-        
+        tabelView.reloadData()
     }
 }
 
 extension LaunchesViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print(arrayLaunches.count)
         return arrayLaunches.count
     }
     
