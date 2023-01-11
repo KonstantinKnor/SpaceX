@@ -1,2 +1,2 @@
 # SpaceX
-[](https://github.com/KonstantinKnor/SpaceX/blob/main/Screenshot.jpg)
+![](https://github.com/KonstantinKnor/SpaceX/blob/main/Screenshot.jpg)
